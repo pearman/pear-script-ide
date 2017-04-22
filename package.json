@@ -1,0 +1,25 @@
+{
+  "name": "pear-script-ide",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "react-scripts": "0.9.5"
+  },
+  "dependencies": {
+    "brace": "^0.10.0",
+    "material-ui": "^0.17.4",
+    "pear-script": "0.0.10",
+    "react": "^15.5.4",
+    "react-ace": "^4.2.1",
+    "react-dom": "^15.5.4",
+    "react-json-tree": "^0.10.9",
+    "react-tap-event-plugin": "^2.0.1",
+    "rxjs": "^5.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
