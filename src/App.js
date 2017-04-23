@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 
+import * as _ from 'lodash';
+
 import { Subject } from 'rxjs';
 
 import brace from 'brace';
@@ -13,6 +15,7 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import IconButton from 'material-ui/IconButton';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
 
 import { Interpreter } from 'pear-script';
 
@@ -26,7 +29,8 @@ class App extends Component {
     code: '',
     status: '',
     statusColor: '',
-    parseTree: {}
+    parseTree: {},
+    consoleOutput: ''
   }
 
   successColor = '#43A047';
@@ -95,7 +99,7 @@ class App extends Component {
     return (
       <div style={{ width: '100%' }}>
         <AppBar
-          style={{ backgroundColor: '#43A047' }}
+          style={{ backgroundColor: '#43A047'}}
           title="pear-script"
           iconElementLeft={<img src={logo} style={{height: '2em', padding: '0.5em'}}/>}
         />
@@ -103,26 +107,25 @@ class App extends Component {
           mode='ruby'
           theme='github'
           name='editor'
-          editorProps={{ $blockScrolling: true }}
-          style={{ width: '100%', height: '100%', position: 'absolute' }}
+          width='100%'
+          height='calc(100vh - 64px)'
+          style={{position: 'absolute'}}
           value={this.state.code}
           onChange={this.editorOnChange}
+          highlightActiveLine={false}
         />
-        <div style={{position: 'absolute', right: '1em'}}>
+        <div style={{position: 'absolute', right: '0%', paddingRight: '1em', top: '64px', overflow: 'auto', zIndex: 1}}>
           <JSONTree data={this.state.parseTree} theme={this.theme}/>
         </div>
-        <Card style={{position: 'fixed', width: '100%', bottom: '0%', zIndex: '5'}}>
+        <Card style={{position: 'fixed', width: '100%', right: '0%', bottom: '0%', zIndex: '5'}}>
           <CardHeader
             title={<span><b>Output</b> <span style={{color: this.state.statusColor}}>{this.state.status}</span> </span>}
             actAsExpander={true}
             showExpandableButton={true}
           />
-          {/*<CardActions>
-            <FlatButton label="Action1" />
-            <FlatButton label="Action2" />
-          </CardActions>*/}
           <CardText expandable={true}>
             <span>{this.printOutput(this.state.output)}</span>
+            <span>{this.state.consoleOutput}</span>
           </CardText>
         </Card>
       </div>
