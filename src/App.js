@@ -30,7 +30,7 @@ class App extends Component {
     status: '',
     statusColor: '',
     parseTree: {},
-    consoleOutput: ''
+    console: ''
   }
 
   successColor = '#43A047';
@@ -60,7 +60,12 @@ class App extends Component {
   };
 
   constructor(props) {
-    super(props)
+    super(props);
+    let oldLog = _.cloneDeep(window.console.log);
+    window.console.log = (str) => {
+      let curr = this.state.console;
+      this.setState({console: `${curr}<br />${str}`});
+    }
     this.codeRunSubject
       .debounceTime(100)
       .subscribe(code => this.runCode(code));
@@ -74,6 +79,7 @@ class App extends Component {
   runCode = (code) => {
     let result = null;
     try {
+      this.state.console = '';
       result = this.interpreter.interpret(code);
       this.setState({ 
         output: result, 
@@ -124,8 +130,7 @@ class App extends Component {
             showExpandableButton={true}
           />
           <CardText expandable={true}>
-            <span>{this.printOutput(this.state.output)}</span>
-            <span>{this.state.consoleOutput}</span>
+            <span dangerouslySetInnerHTML={{__html: this.state.console}} />
           </CardText>
         </Card>
       </div>
