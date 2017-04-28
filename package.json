@@ -9,7 +9,7 @@
     "brace": "^0.10.0",
     "lodash": "^4.17.4",
     "material-ui": "^0.17.4",
-    "pear-script": "^0.0.11",
+    "pear-script": "^0.0.13",
     "react": "^15.5.4",
     "react-ace": "^4.2.1",
     "react-dom": "^15.5.4",

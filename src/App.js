@@ -11,16 +11,14 @@ import AceEditor from 'react-ace';
 import JSONTree from 'react-json-tree';
 
 import AppBar from 'material-ui/AppBar';
-import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
-import IconButton from 'material-ui/IconButton';
-import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
-import FlatButton from 'material-ui/FlatButton';
-import Paper from 'material-ui/Paper';
+import {Card, CardHeader, CardText} from 'material-ui/Card';
 
 import { Interpreter } from 'pear-script';
 
 import 'brace/mode/ruby';
 import 'brace/theme/github';
+
+import TreeView from './TreeView';
 
 class App extends Component {
 
@@ -38,30 +36,8 @@ class App extends Component {
   interpreter = new Interpreter();
   codeRunSubject = new Subject();
 
-  theme = {
-    scheme: 'bright',
-    author: 'chris kempson (http://chriskempson.com)',
-    base00: '#000000',
-    base01: '#303030',
-    base02: '#505050',
-    base03: '#b0b0b0',
-    base04: '#d0d0d0',
-    base05: '#e0e0e0',
-    base06: '#f5f5f5',
-    base07: '#ffffff',
-    base08: '#fb0120',
-    base09: '#fc6d24',
-    base0A: '#fda331',
-    base0B: '#a1c659',
-    base0C: '#76c7b7',
-    base0D: '#6fb3d2',
-    base0E: '#d381c3',
-    base0F: '#be643c'
-  };
-
   constructor(props) {
     super(props);
-    let oldLog = _.cloneDeep(window.console.log);
     window.console.log = (str) => {
       let curr = this.state.console;
       this.setState({console: `${curr}<br />${str}`});
@@ -77,15 +53,15 @@ class App extends Component {
   }
 
   runCode = (code) => {
-    let result = null;
     try {
       this.state.console = '';
-      result = this.interpreter.interpret(code);
+      let result = this.interpreter.eval(code);
+      let parseTree = this.interpreter.parseTree;
       this.setState({ 
         output: result, 
         status: 'Successfully Run', 
         statusColor: this.successColor,
-        parseTree: this.interpreter.parseTree
+        parseTree: parseTree
       });
     } catch(err) {
       let status = '';
@@ -120,9 +96,7 @@ class App extends Component {
           onChange={this.editorOnChange}
           highlightActiveLine={false}
         />
-        <div style={{position: 'absolute', right: '0%', paddingRight: '1em', top: '64px', overflow: 'auto', zIndex: 1}}>
-          <JSONTree data={this.state.parseTree} theme={this.theme}/>
-        </div>
+        <TreeView data={this.state.parseTree} />
         <Card style={{position: 'fixed', width: '100%', right: '0%', bottom: '0%', zIndex: '5'}}>
           <CardHeader
             title={<span><b>Output</b> <span style={{color: this.state.statusColor}}>{this.state.status}</span> </span>}
