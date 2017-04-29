@@ -45,7 +45,7 @@ class TreeView extends Component {
 
   render() {
     return (
-      <div style={{position: 'absolute', right: '0%', paddingRight: '1em', top: '64px', overflow: 'auto', maxWidth: '25%', zIndex: 1}}>
+      <div style={{position: 'absolute', right: '0%', paddingRight: '1em', top: '64px', overflow: 'auto', maxWidth: '25%', zIndex: 1, opacity: 0.8}}>
         <JSONTree 
             data={this.clean(this.props.data)} 
             theme={this.theme}

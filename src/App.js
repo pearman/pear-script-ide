@@ -18,6 +18,7 @@ import Dialog from 'material-ui/Dialog';
 import {List, ListItem} from 'material-ui/List';
 
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
+import Help from 'material-ui/svg-icons/action/help';
 
 import { Interpreter } from 'pear-script';
 
@@ -30,7 +31,7 @@ import examples from './examples';
 class App extends Component {
 
   state = {
-    code: '',
+    code: examples['Getting Started (Hello World)'],
     status: '',
     statusColor: '',
     parseTree: {},
@@ -38,7 +39,7 @@ class App extends Component {
     helpOpen: false
   }
 
-  successColor = '#43A047';
+  successColor = 'rgb(124, 160, 67)';
   precomputedColor = 'orange';
   failColor = 'red';
   interpreter = new Interpreter();
@@ -65,6 +66,8 @@ class App extends Component {
     this.precomputeSubject
       .debounceTime(500)
       .subscribe(code => this.precompute(code));
+
+    this.precomputeSubject.next(this.state.code);
   }
 
   handleHelpOpen = () => {
@@ -124,12 +127,12 @@ class App extends Component {
     return (
       <div style={{ width: '100%' }}>
         <AppBar
-          style={{ backgroundColor: '#43A047'}}
+          style={{ backgroundColor: 'rgb(124, 160, 67)'}}
           title="pear-script"
           iconElementLeft={<img src={logo} style={{height: '2em', padding: '0.5em'}}/>}
         >
           <div style={{display: 'flex', alignItems: 'center'}}>
-            <FlatButton style={{color: 'white'}} label="Examples" onTouchTap={this.handleHelpOpen}/>
+            <IconButton iconStyle={{color: 'white'}} onTouchTap={this.handleHelpOpen}> <Help /> </IconButton>
             <IconButton iconStyle={{color: 'white'}} onTouchTap={this.eval}> <PlayArrow/> </IconButton>
           </div>
         </AppBar>
@@ -145,13 +148,13 @@ class App extends Component {
           highlightActiveLine={false}
         />
         <TreeView data={this.state.parseTree} />
-        <Card style={{position: 'fixed', width: '100%', right: '0%', bottom: '0%', zIndex: '5'}}>
+        <Card style={{position: 'fixed', width: '100%', right: '0%', bottom: '0%', zIndex: '5', maxHeight: '50%'}}>
           <CardHeader
             title={<span><b>Output</b> <span style={{color: this.state.statusColor}}>{this.state.status}</span> </span>}
             actAsExpander={true}
             showExpandableButton={true}
           />
-          <CardText expandable={true}>
+          <CardText expandable={true} style={{overflow: 'auto', maxHeight: 'calc(50vh - 50px)'}}>
             <span dangerouslySetInnerHTML={{__html: this.state.console}} />
           </CardText>
         </Card>
