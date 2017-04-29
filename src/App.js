@@ -21,8 +21,7 @@ import Divider from 'material-ui/Divider';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Help from 'material-ui/svg-icons/action/help';
 
-import { Interpreter } from '../../../../Documents/g-lang/dist/index';
-//import { Interpreter } from 'pear-script';
+import { Interpreter } from 'pear-script';
 
 import 'brace/mode/ruby';
 import 'brace/theme/github';
