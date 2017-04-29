@@ -16,11 +16,13 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import {List, ListItem} from 'material-ui/List';
+import Divider from 'material-ui/Divider';
 
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Help from 'material-ui/svg-icons/action/help';
 
-import { Interpreter } from 'pear-script';
+import { Interpreter } from '../../../../Documents/g-lang/dist/index';
+//import { Interpreter } from 'pear-script';
 
 import 'brace/mode/ruby';
 import 'brace/theme/github';
@@ -164,6 +166,9 @@ class App extends Component {
           open={this.state.helpOpen}
           onRequestClose={this.handleHelpClose}
         >
+          Read the documentation <a target="_blank" href='https://pearman.github.io/pear-script/'>here</a>.
+          <br /><br />
+          <Divider />
           <List>
             { 
               _.map(examples, (prog, name) => 
