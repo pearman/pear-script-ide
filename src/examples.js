@@ -7,7 +7,7 @@ let examples = {
 	'Getting Started (Tables)' : `
 # Tables are the only data structure
 # in pear-script. They act as 
-# arrays, maps, and functions.
+# arrays, maps, and functions
 
 # Table as an array
 x: { 4 3 2 1 }
@@ -41,6 +41,7 @@ Point: (x y) {
 p1: Point(0 0)
 p2: p1.add(Point(1 1))
 
+# Play with our Points
 result: p1.distanceTo(p2)
 
 result.print()
@@ -53,14 +54,20 @@ fib: (n a b) {
 	# when the function is called
 	a: 1 
 	b: 0
+	# Print our progress
 	a.print()
+	# If n is greater than 0 recurse
 	n.>(0).then(
 		{ fib(n.-(1) a.+(b) a) }
 		a
 	)
 }
 
-fib(10)`,
+# Call our function, note that a and b
+# are filled in by the defaults defined
+# in the 'fib' table
+fib(10)
+`,
 }
 
 export default examples;
