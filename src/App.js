@@ -12,6 +12,12 @@ import JSONTree from 'react-json-tree';
 
 import AppBar from 'material-ui/AppBar';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
+import {List, ListItem} from 'material-ui/List';
+
+import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 
 import { Interpreter } from 'pear-script';
 
@@ -19,49 +25,74 @@ import 'brace/mode/ruby';
 import 'brace/theme/github';
 
 import TreeView from './TreeView';
+import examples from './examples';
 
 class App extends Component {
 
   state = {
-    output: null,
     code: '',
     status: '',
     statusColor: '',
     parseTree: {},
-    console: ''
+    console: '',
+    helpOpen: false
   }
 
   successColor = '#43A047';
+  precomputedColor = 'orange';
   failColor = 'red';
   interpreter = new Interpreter();
-  codeRunSubject = new Subject();
+  precomputeSubject = new Subject();
+  consoleSubject = new Subject();
 
   constructor(props) {
     super(props);
+
+    let oldLog = window.console.log;
     window.console.log = (str) => {
-      let curr = this.state.console;
-      this.setState({console: `${curr}<br />${str}`});
+      oldLog(str);
+      this.consoleSubject.next(str);
     }
-    this.codeRunSubject
+
+    this.consoleSubject
+      .scan((acc, value) => {
+        if (_.isNil(value)) return '';
+        return `${acc}<br />${value}`;
+      }, '')
       .debounceTime(100)
-      .subscribe(code => this.runCode(code));
+      .subscribe(data => this.setState({console: data}));
+
+    this.precomputeSubject
+      .debounceTime(500)
+      .subscribe(code => this.precompute(code));
   }
+
+  handleHelpOpen = () => {
+    this.setState({helpOpen: true});
+  };
+
+  handleHelpClose = () => {
+    this.setState({helpOpen: false});
+  };
 
   editorOnChange = (code) => {
     this.setState({ code });
-    this.codeRunSubject.next(code);
+    this.precomputeSubject.next(code);
   }
 
-  runCode = (code) => {
+  setExample = (code) => {
+    this.setState({ code, helpOpen: false });
+    this.precomputeSubject.next(code);
+  }
+
+  precompute = (code) => {
+    this.consoleSubject.next(null);
     try {
-      this.state.console = '';
-      let result = this.interpreter.eval(code);
-      let parseTree = this.interpreter.parseTree;
+      let parseTree = this.interpreter.precompute(code);
       this.setState({ 
-        output: result, 
-        status: 'Successfully Run', 
-        statusColor: this.successColor,
-        parseTree: parseTree
+        status: `Code Precomputed (${this.interpreter.lastExecutionTime}ms)`, 
+        statusColor: this.precomputedColor,
+        parseTree: parseTree,
       });
     } catch(err) {
       let status = '';
@@ -72,9 +103,21 @@ class App extends Component {
     }
   }
 
-  printOutput = (output) => {
-    if (output && output.value) return '' + output.value;
-    return '';
+  eval = () => {
+    this.consoleSubject.next(null);
+    try {
+      this.interpreter.eval(this.state.code);
+      this.setState({
+        status: `Successfully Run (${this.interpreter.lastExecutionTime}ms)`, 
+        statusColor: this.successColor
+      });
+    } catch(err) {
+      let status = '';
+      if (err && err.location && err.location.end) {
+        status = `Error on line ${err.location.start.line} at character ${err.location.start.column}`;
+      }
+      this.setState({ status, statusColor: this.failColor });
+    }
   }
 
   render() {
@@ -84,7 +127,12 @@ class App extends Component {
           style={{ backgroundColor: '#43A047'}}
           title="pear-script"
           iconElementLeft={<img src={logo} style={{height: '2em', padding: '0.5em'}}/>}
-        />
+        >
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            <FlatButton style={{color: 'white'}} label="Examples" onTouchTap={this.handleHelpOpen}/>
+            <IconButton iconStyle={{color: 'white'}} onTouchTap={this.eval}> <PlayArrow/> </IconButton>
+          </div>
+        </AppBar>
         <AceEditor
           mode='ruby'
           theme='github'
@@ -107,6 +155,19 @@ class App extends Component {
             <span dangerouslySetInnerHTML={{__html: this.state.console}} />
           </CardText>
         </Card>
+        <Dialog
+          title="Examples"
+          modal={false}
+          open={this.state.helpOpen}
+          onRequestClose={this.handleHelpClose}
+        >
+          <List>
+            { 
+              _.map(examples, (prog, name) => 
+                <ListItem primaryText={name} key={name} onTouchTap={() => this.setExample(prog)}/>)
+            }
+          </List>
+        </Dialog>
       </div>
     );
   }

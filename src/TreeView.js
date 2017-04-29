@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import JSONTree from 'react-json-tree';
 
+import * as _ from 'lodash';
+
 class TreeView extends Component {
   theme = {
     scheme: 'bright',
@@ -23,6 +25,17 @@ class TreeView extends Component {
     base0F: '#be643c'
   };
 
+  clean = (object) => {
+    if (_.isArray(object)) return object;
+    return _.mapValues(
+      _.omitBy(object, value => _.isFunction(value)), 
+      value => {
+        if (_.isObject(value)) return this.clean(value);
+        return value;
+      }
+    );
+  }
+
   getItemString = (type, data, itemType, itemString) => {
     let psType = '';
     if (type === 'Object') psType = 'Table';
@@ -34,7 +47,7 @@ class TreeView extends Component {
     return (
       <div style={{position: 'absolute', right: '0%', paddingRight: '1em', top: '64px', overflow: 'auto', maxWidth: '25%', zIndex: 1}}>
         <JSONTree 
-            data={this.props.data} 
+            data={this.clean(this.props.data)} 
             theme={this.theme}
             getItemString={this.getItemString}
             />
